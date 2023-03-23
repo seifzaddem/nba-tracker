@@ -1,0 +1,13 @@
+<div class="card" *ngIf="team">
+  <h3>{{team.full_name}} [{{team.abbreviation}}]</h3>
+  <h6>{{team.conference}}ern conference</h6>
+  <hr/>
+  <p>
+    Scores of past 12 days:
+  </p>
+  <p *ngFor="let game of games$ | async">
+    <strong>{{game.home_team.abbreviation}}</strong>  {{game.home_team_score}} - {{game.visitor_team_score}} <strong>{{game.visitor_team.abbreviation}}</strong>
+  </p>
+  <button class="tertiary" routerLink=""><< Back to all team stats</button>
+
+</div>
