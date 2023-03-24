@@ -86,13 +86,8 @@ export class GameStatsComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
 
-  trackSingleTeam(): void {
+  trackTeam(): void {
     this.nbaService.addTrackedTeam(this.form.controls[this.TEAM_FORM_KEY].value);
   }
 
-  trackTeam(teamId: string): void {
-    let team = this.allTeams.find(team => team.id == Number(teamId));
-    if (team)
-      this.nbaService.addTrackedTeam(team);
-  }
 }

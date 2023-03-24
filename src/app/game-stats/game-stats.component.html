@@ -1,6 +1,6 @@
 <ng-container *ngIf="allTeams$ | async as teams else loading">
   <div class="row">
-    <form [formGroup]="form" (ngSubmit)="trackSingleTeam()">
+    <form [formGroup]="form" (ngSubmit)="trackTeam()">
       <div>
         <select [formControlName]="CONFERENCE_FORM_KEY" ngDefaultControl>
           <option *ngFor="let conference of conferences" [ngValue]="conference">
