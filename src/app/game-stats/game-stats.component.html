@@ -17,18 +17,26 @@
             {{team.full_name}}
           </option>
         </select>
-        <!--      <button class="primary" (click)="trackTeam(teamSelect.value)">Track team</button>-->
         <button class="primary" type="submit" [disabled]="form.invalid">Track team</button>
-
       </div>
     </form>
   </div>
+
+  <div class="row" *ngIf="nbaService.getTrackedTeams().length !== 0">
+    <p>Result of past</p>
+    <select [formControl]="daysFormControl" ngDefaultControl>
+      <option *ngFor="let day of days" [ngValue]="day">
+        {{day}}
+      </option>
+    </select>
+    <p>days</p>
+  </div>
+  <div class="row">
+    <app-team-stats class="col-sm-4" *ngFor="let team of nbaService.getTrackedTeams()" [team]="team"
+                    [day]="daysFormControl.value">
+
+    </app-team-stats>
+  </div>
 </ng-container>
-<div class="row">
-  <app-team-stats class="col-sm-4" *ngFor="let team of nbaService.getTrackedTeams()" [team]="team">
-
-  </app-team-stats>
-</div>
-
 <ng-template #loading>Loading...</ng-template>
 
