@@ -44,9 +44,9 @@ export class GameStatsComponent implements OnInit, OnDestroy {
   readonly TEAM_FORM_KEY = 'team';
   readonly DIVISION_FORM_KEY = 'division'
   days = Object.values(DAYS);
-  daysFormControl = new FormControl<number>(DAYS.TWELVE, {nonNullable: true});
+  dayFormControl = new FormControl<number>(DAYS.TWELVE, {nonNullable: true});
 
-  constructor(protected nbaService: NbaService, protected formBuilder: FormBuilder) {
+  constructor(private nbaService: NbaService, private formBuilder: FormBuilder) {
   }
 
   ngOnInit(): void {
@@ -98,4 +98,11 @@ export class GameStatsComponent implements OnInit, OnDestroy {
     this.nbaService.addTrackedTeam(this.form.controls[this.TEAM_FORM_KEY].value);
   }
 
+  getTrackedTeams(): Team[] {
+    return this.nbaService.getTrackedTeams()
+  }
+
+  hasTrackedTeams(): boolean {
+    return this.nbaService.getTrackedTeams().length !== 0
+  }
 }

@@ -22,9 +22,9 @@
     </form>
   </div>
 
-  <div class="row" *ngIf="nbaService.getTrackedTeams().length !== 0">
+  <div class="row" *ngIf="hasTrackedTeams()">
     <p>Result of past</p>
-    <select [formControl]="daysFormControl" ngDefaultControl>
+    <select [formControl]="dayFormControl" ngDefaultControl>
       <option *ngFor="let day of days" [ngValue]="day">
         {{day}}
       </option>
@@ -32,8 +32,8 @@
     <p>days</p>
   </div>
   <div class="row">
-    <app-team-stats class="col-sm-4" *ngFor="let team of nbaService.getTrackedTeams()" [team]="team"
-                    [day]="daysFormControl.value">
+    <app-team-stats class="col-sm-4" *ngFor="let team of getTrackedTeams()" [team]="team"
+                    [day]="dayFormControl.value">
 
     </app-team-stats>
   </div>

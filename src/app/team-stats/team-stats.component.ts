@@ -1,5 +1,5 @@
 import {Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges} from '@angular/core';
-import {catchError, EMPTY, Subject, Subscription, switchMap, tap} from 'rxjs';
+import {catchError, EMPTY, mergeMap, Subject, Subscription, tap} from 'rxjs';
 import {NbaService} from '../nba.service';
 import {Stats, Team} from '../data.models';
 
@@ -14,14 +14,14 @@ export class TeamStatsComponent implements OnInit, OnDestroy, OnChanges {
   team!: Team;
 
   @Input()
-  day: number;
+  day!: number;
 
   stats!: Stats;
   games$: Subject<void> = new Subject<void>();
   subscriptions: Subscription[] = [];
 
 
-  constructor(protected nbaService: NbaService) {
+  constructor(private nbaService: NbaService) {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -32,7 +32,7 @@ export class TeamStatsComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnInit(): void {
     this.subscriptions.push(this.games$.pipe(
-      switchMap(() => this.nbaService.getLastResults(this.team, this.day)),
+      mergeMap(() => this.nbaService.getLastResults(this.team, this.day)),
       catchError(() => EMPTY),
       tap(games => this.stats = this.nbaService.getStatsFromGames(games, this.team))
     ).subscribe());
@@ -44,4 +44,7 @@ export class TeamStatsComponent implements OnInit, OnDestroy, OnChanges {
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
 
+  removeTrackedTeam(team: Team) {
+    this.nbaService.removeTrackedTeam(team)
+  }
 }

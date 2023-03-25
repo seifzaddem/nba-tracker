@@ -1,6 +1,6 @@
 <div class="card" *ngIf="stats">
   <div>
-    <h3>{{team.full_name}} [{{team.abbreviation}}] <span (click)="nbaService.removeTrackedTeam(team)">&times;</span>
+    <h3>{{team.full_name}} [{{team.abbreviation}}] <span (click)="removeTrackedTeam(team)">&times;</span>
     </h3>
     <h6>{{team.conference}}ern conference</h6>
   </div>
