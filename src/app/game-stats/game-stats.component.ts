@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Team} from '../data.models';
 import {combineLatestWith, Observable, startWith, Subscription, tap} from 'rxjs';
 import {NbaService} from '../nba.service';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 
 export const CONFERENCE = {
   EMPTY: 'Choose...',
@@ -18,6 +18,12 @@ export const DIVISION = {
   ATLANTIC: 'Atlantic',
   CENTRAL: 'Central',
   PACIFIC: 'Pacific'
+}
+
+export const DAYS = {
+  SIX: 6,
+  TWELVE: 12,
+  TWENTY: 20
 }
 
 @Component({
@@ -37,8 +43,10 @@ export class GameStatsComponent implements OnInit, OnDestroy {
   readonly CONFERENCE_FORM_KEY = 'conference';
   readonly TEAM_FORM_KEY = 'team';
   readonly DIVISION_FORM_KEY = 'division'
+  days = Object.values(DAYS);
+  dayFormControl = new FormControl<number>(DAYS.TWELVE, {nonNullable: true});
 
-  constructor(protected nbaService: NbaService, protected formBuilder: FormBuilder) {
+  constructor(private nbaService: NbaService, private formBuilder: FormBuilder) {
   }
 
   ngOnInit(): void {
@@ -86,13 +94,12 @@ export class GameStatsComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
 
-  trackSingleTeam(): void {
-
+  trackTeam(): void {
+    this.nbaService.addTrackedTeam(this.form.controls[this.TEAM_FORM_KEY].value);
   }
 
-  trackTeam(teamId: string): void {
-    let team = this.allTeams.find(team => team.id == Number(teamId));
-    if (team)
-      this.nbaService.addTrackedTeam(team);
+  getTrackedTeams(): Team[] {
+    return this.nbaService.getTrackedTeams()
   }
+
 }

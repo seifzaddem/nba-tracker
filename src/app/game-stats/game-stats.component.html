@@ -1,6 +1,6 @@
 <ng-container *ngIf="allTeams$ | async as teams else loading">
   <div class="row">
-    <form [formGroup]="form" (ngSubmit)="trackSingleTeam()">
+    <form [formGroup]="form" (ngSubmit)="trackTeam()">
       <div>
         <select [formControlName]="CONFERENCE_FORM_KEY" ngDefaultControl>
           <option *ngFor="let conference of conferences" [ngValue]="conference">
@@ -17,18 +17,26 @@
             {{team.full_name}}
           </option>
         </select>
-        <!--      <button class="primary" (click)="trackTeam(teamSelect.value)">Track team</button>-->
         <button class="primary" type="submit" [disabled]="form.invalid">Track team</button>
-
       </div>
     </form>
   </div>
+
+  <div class="row">
+    <p>Result of past</p>
+    <select [formControl]="dayFormControl" ngDefaultControl>
+      <option *ngFor="let day of days" [ngValue]="day">
+        {{day}}
+      </option>
+    </select>
+    <p>days</p>
+  </div>
+  <div class="row">
+    <app-team-stats class="col-sm-4" *ngFor="let team of getTrackedTeams()" [team]="team"
+                    [day]="dayFormControl.value">
+
+    </app-team-stats>
+  </div>
 </ng-container>
-<div class="row">
-  <app-team-stats class="col-sm-4" *ngFor="let team of nbaService.getTrackedTeams()" [team]="team">
-
-  </app-team-stats>
-</div>
-
 <ng-template #loading>Loading...</ng-template>
 
