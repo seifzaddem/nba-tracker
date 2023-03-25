@@ -8,13 +8,15 @@ import {TeamStatsComponent} from './team-stats/team-stats.component';
 import {ReactiveFormsModule} from '@angular/forms';
 import {GameResultsComponent} from './game-results/game-results.component';
 import {GameStatsComponent} from './game-stats/game-stats.component';
+import {ModalContainerComponent} from './modal-container/modal-container.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     TeamStatsComponent,
     GameResultsComponent,
-    GameStatsComponent
+    GameStatsComponent,
+    ModalContainerComponent
   ],
   imports: [
     BrowserModule,

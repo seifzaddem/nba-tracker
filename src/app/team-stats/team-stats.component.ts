@@ -19,6 +19,7 @@ export class TeamStatsComponent implements OnInit, OnDestroy, OnChanges {
   stats!: Stats;
   games$: Subject<void> = new Subject<void>();
   subscriptions: Subscription[] = [];
+  isModalOpen: boolean;
 
 
   constructor(private nbaService: NbaService) {
@@ -44,7 +45,12 @@ export class TeamStatsComponent implements OnInit, OnDestroy, OnChanges {
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
 
-  removeTrackedTeam(team: Team) {
+  removeTrackedTeam(team: Team): void {
+    this.closeModal();
     this.nbaService.removeTrackedTeam(team)
+  }
+
+  closeModal(): void {
+    this.isModalOpen = !this.isModalOpen;
   }
 }

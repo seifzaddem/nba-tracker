@@ -1,6 +1,6 @@
 <div class="card" *ngIf="stats">
   <div>
-    <h3>{{team.full_name}} [{{team.abbreviation}}] <span (click)="removeTrackedTeam(team)">&times;</span>
+    <h3>{{team.full_name}} [{{team.abbreviation}}] <span (click)="closeModal()">&times;</span>
     </h3>
     <h6>{{team.conference}}ern conference</h6>
   </div>
@@ -28,3 +28,13 @@
   </div>
 
 </div>
+
+<app-modal-container *ngIf="isModalOpen">
+  <div>
+    <p>The team &quot;{{team.full_name}}&quot; will be untracked</p>
+  </div>
+  <div>
+    <button (click)="closeModal()">No</button>
+    <button (click)="removeTrackedTeam(team)">Yes</button>
+  </div>
+</app-modal-container>

@@ -1,0 +1,18 @@
+.modal-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  backdrop-filter: blur(3px);
+  z-index: 10;
+}
+
+.modal-body {
+  background: white;
+  border: 2px solid gray;
+  border-radius: 10px;
+}

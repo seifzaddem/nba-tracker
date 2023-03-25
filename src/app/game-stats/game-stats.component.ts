@@ -102,7 +102,4 @@ export class GameStatsComponent implements OnInit, OnDestroy {
     return this.nbaService.getTrackedTeams()
   }
 
-  hasTrackedTeams(): boolean {
-    return this.nbaService.getTrackedTeams().length !== 0
-  }
 }

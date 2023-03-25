@@ -22,7 +22,7 @@
     </form>
   </div>
 
-  <div class="row" *ngIf="hasTrackedTeams()">
+  <div class="row">
     <p>Result of past</p>
     <select [formControl]="dayFormControl" ngDefaultControl>
       <option *ngFor="let day of days" [ngValue]="day">
