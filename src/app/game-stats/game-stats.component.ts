@@ -1,17 +1,17 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Team} from '../data.models';
-import {combineLatestWith, Observable, startWith, Subscription, tap} from 'rxjs';
+import {Observable, Subscription, tap} from 'rxjs';
 import {NbaService} from '../nba.service';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 
 export const CONFERENCE = {
-  EMPTY: 'Choose...',
+  EMPTY: 'Choose a conference',
   WEST: 'West',
   EAST: 'East'
 }
 
 export const DIVISION = {
-  EMPTY: 'Choose...',
+  EMPTY: 'Choose a division',
   SOUTH_EAST: 'Southeast',
   SOUTH_WEST: 'Southwest',
   NORTH_WEST: 'Northwest',
@@ -26,6 +26,11 @@ export const DAYS = {
   TWENTY: 20
 }
 
+export const DIVISIONS_BY_CONFERENCE_MAP = new Map<string, string[]>([
+  [CONFERENCE.WEST, [DIVISION.EMPTY, DIVISION.SOUTH_WEST, DIVISION.NORTH_WEST, DIVISION.PACIFIC]],
+  [CONFERENCE.EAST, [DIVISION.EMPTY, DIVISION.CENTRAL, DIVISION.ATLANTIC, DIVISION.SOUTH_EAST]]
+])
+
 @Component({
   selector: 'app-game-stats',
   templateUrl: './game-stats.component.html',
@@ -38,8 +43,9 @@ export class GameStatsComponent implements OnInit, OnDestroy {
   allTeams: Team[] = [];
   filteredTeams: Team[] = [];
   subscriptions: Subscription[] = [];
-  conferences = Object.values(CONFERENCE);
+  readonly conferences = Object.values(CONFERENCE);
   readonly divisions = Object.values(DIVISION);
+  filteredDivisions = Object.values(DIVISION);
   readonly CONFERENCE_FORM_KEY = 'conference';
   readonly TEAM_FORM_KEY = 'team';
   readonly DIVISION_FORM_KEY = 'division'
@@ -65,28 +71,45 @@ export class GameStatsComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.subscriptions.push(
-      this.form.controls[this.CONFERENCE_FORM_KEY].valueChanges.pipe(
-        startWith(CONFERENCE.EMPTY),
-        combineLatestWith(this.form.controls[this.DIVISION_FORM_KEY].valueChanges.pipe(startWith(DIVISION.EMPTY))),
-        tap(([conference, division]) => {
-          if (conference != CONFERENCE.EMPTY && division != DIVISION.EMPTY) {
-            this.filteredTeams = this.allTeams.filter(team => team.conference == conference && team.division == division);
-          } else if (conference == CONFERENCE.EMPTY && division != DIVISION.EMPTY) {
-            this.filteredTeams = this.allTeams.filter(team => team.division == division);
-          } else if (conference != CONFERENCE.EMPTY && division == DIVISION.EMPTY) {
-            this.filteredTeams = this.allTeams.filter(team => team.conference == conference);
+    this.subscriptions.push(this.form.controls[this.CONFERENCE_FORM_KEY].valueChanges.pipe(
+      tap(conference => {
+        let selectedDivision = this.form.controls[this.DIVISION_FORM_KEY].value;
+        if (conference != CONFERENCE.EMPTY) {
+          if (!this.isDivisionCorrespondingToConference(conference, selectedDivision)) {
+            this.setDivisionsByConference(conference);
+            this.setFilteredTeamsByConference(conference);
+          }
+          if (!this.filteredDivisions.includes(selectedDivision)) {
+            this.form.controls[this.DIVISION_FORM_KEY].setValue(DIVISION.EMPTY, {emitEvent: false});
+          }
+        } else {
+          this.resetFilteredDivisions();
+          if (selectedDivision == DIVISION.EMPTY) {
+            this.resetFilteredTeams();
           } else {
-            this.filteredTeams = this.allTeams;
+            this.setFilteredTeamsByDivision(selectedDivision);
           }
 
-          if (this.filteredTeams.length != 0) {
-            this.form.controls[this.TEAM_FORM_KEY].setValue(this.filteredTeams[0]);
+        }
+      })
+    ).subscribe());
+
+    this.subscriptions.push(this.form.controls[this.DIVISION_FORM_KEY].valueChanges.pipe(
+      tap(division => {
+        if (division != DIVISION.EMPTY) {
+          this.setFilteredTeamsByDivision(division);
+          this.setConferenceByDivision(division);
+          this.setDivisionsByConference(this.form.controls[this.CONFERENCE_FORM_KEY].value);
+        } else {
+          let selectedConference = this.form.controls[this.CONFERENCE_FORM_KEY].value;
+          if (selectedConference != CONFERENCE.EMPTY) {
+            this.setFilteredTeamsByConference(selectedConference);
           } else {
-            this.form.controls[this.TEAM_FORM_KEY].setValue(null);
+            this.resetFilteredTeams();
           }
-        })
-      ).subscribe());
+        }
+      })
+    ).subscribe());
 
   }
 
@@ -100,6 +123,49 @@ export class GameStatsComponent implements OnInit, OnDestroy {
 
   getTrackedTeams(): Team[] {
     return this.nbaService.getTrackedTeams()
+  }
+
+  private getConferenceByDivision(division: string): string | undefined {
+    return division != DIVISION.EMPTY ? Array.from(DIVISIONS_BY_CONFERENCE_MAP.entries())
+      .find(([_, divisions]) => divisions.includes(division))?.[0] : CONFERENCE.EMPTY;
+  }
+
+  private setFilteredTeamsByConference(conference: string): void {
+    this.filteredTeams = this.allTeams.filter(team => team.conference == conference);
+    this.setSelectedFilteredTeam();
+  }
+
+  private setFilteredTeamsByDivision(division: string): void {
+    this.filteredTeams = this.allTeams.filter(team => team.division == division);
+    this.setSelectedFilteredTeam();
+  }
+
+  private setSelectedFilteredTeam(): void {
+    if (this.filteredTeams.length != 0) {
+      this.form.controls[this.TEAM_FORM_KEY].setValue(this.filteredTeams[0]);
+    } else {
+      this.form.controls[this.TEAM_FORM_KEY].setValue(null);
+    }
+  }
+
+  private isDivisionCorrespondingToConference(conference: string, division: string): boolean {
+    return conference == this.getConferenceByDivision(division);
+  }
+
+  private setDivisionsByConference(conference: string): void {
+    this.filteredDivisions = DIVISIONS_BY_CONFERENCE_MAP.get(conference)!;
+  }
+
+  private resetFilteredDivisions() {
+    this.filteredDivisions = this.divisions;
+  }
+
+  private resetFilteredTeams(): void {
+    this.filteredTeams = this.allTeams;
+  }
+
+  private setConferenceByDivision(division: string) {
+    this.form.controls[this.CONFERENCE_FORM_KEY].setValue(this.getConferenceByDivision(division), {emitEvent: false});
   }
 
 }

@@ -8,7 +8,7 @@
           </option>
         </select>
         <select [formControlName]="DIVISION_FORM_KEY" ngDefaultControl>
-          <option *ngFor="let division of divisions" [ngValue]="division">
+          <option *ngFor="let division of filteredDivisions" [ngValue]="division">
             {{division}}
           </option>
         </select>
