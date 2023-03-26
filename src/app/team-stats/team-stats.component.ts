@@ -33,8 +33,7 @@ export class TeamStatsComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnInit(): void {
     this.subscriptions.push(this.games$.pipe(
-      mergeMap(() => this.nbaService.getLastResults(this.team, this.day)),
-      catchError(() => EMPTY),
+      mergeMap(() => this.nbaService.getLastResults(this.team, this.day).pipe(catchError(() => EMPTY))),
       tap(games => this.stats = this.nbaService.getStatsFromGames(games, this.team))
     ).subscribe());
 
